@@ -6,17 +6,31 @@ import { MdOutlineLock } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { VERIFY_EMAIL } from "@/constants";
+import { onboardingService } from "@/services";
 
 const CreatePassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
-  const [accessCode, userId] = [
+  const [accessCode, requestId] = [
     searchParams.get("accessCode"),
-    searchParams.get("userId"),
+    searchParams.get("requestId"),
   ];
 
-  // console.log({ accessCode, userId });
+  const {} = useQuery({
+    queryKey: [VERIFY_EMAIL, accessCode, requestId],
+    queryFn: async () => {
+        const payload = {
+          accessCode: accessCode ?? "",
+          id: requestId ?? ""
+        }
+        // const response = await onboardingService.verifyEmail(payload);
+
+        // return response?.data;
+    }
+  })
 
   const handleToggleShowPassword = () => {
     setShowPassword((shown) => !shown);
