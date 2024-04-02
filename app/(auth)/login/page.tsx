@@ -4,22 +4,14 @@ import { TextInput } from "@/components/shared";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MdOutlineLock, MdOutlineMailOutline } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import {
-  IoEyeOutline,
-  IoEyeOffOutline,
-  IoAlertCircleOutline,
-  IoCheckmark,
-} from "react-icons/io5";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { ClipLoader, PulseLoader } from "react-spinners";
-import { VERIFY_EMAIL } from "@/constants";
-import { loginService, onboardingService } from "@/services";
+import { useRouter } from "next/navigation";
+import { PulseLoader } from "react-spinners";
+import { loginService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "react-toastify";
 
 const schema = z.object({
@@ -41,36 +33,11 @@ const Login = () => {
     register,
     setError,
     handleSubmit,
-
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
   });
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams();
-  const [accessCode, requestId] = [
-    searchParams.get("access-code"),
-    searchParams.get("requestId"),
-  ];
-
-  const {
-    data,
-    isError,
-    error,
-    isLoading: isVerifying,
-  } = useQuery({
-    queryKey: [VERIFY_EMAIL, accessCode, requestId],
-    queryFn: async () => {
-      const payload = {
-        accessCode: accessCode ?? "",
-        id: requestId ?? "",
-      };
-      const response = await onboardingService.verifyEmail(payload);
-      console.log(response);
-      return response;
-    },
-    retry: false,
-  });
 
   const handleToggleShowPassword = () => {
     setShowPassword((shown) => !shown);
@@ -86,6 +53,7 @@ const Login = () => {
       sessionStorage.setItem("token", response?.data?.token);
       router.push("/dashboard");
     } catch (error: any) {
+      console.log(error?.response);
       const errorData = error?.response?.data?.data?.errors;
 
       if (errorData) {
@@ -95,28 +63,19 @@ const Login = () => {
         toast.error(formattedValidationErrors);
         setError("root", { type: "deps", message: formattedValidationErrors });
       } else {
+        setError("root", {
+          type: "deps",
+          message:
+            error?.response?.data?.data?.title ??
+            error?.message ??
+            "An error occurred",
+        });
         toast.error(
           error?.response?.data?.data?.title ??
             error?.message ??
             "An error occurred"
         );
       }
-    }
-  };
-
-  const formatError = () => {
-    const customError = error as any;
-    console.log(customError?.response);
-
-    if (customError?.response?.data?.data?.errors) {
-      return (
-        formatValidationErrors(customError?.response?.data?.data?.errors) ??
-        "Unable to verify link"
-      );
-    } else {
-      return (
-        customError?.response?.data?.data?.title ?? "Unable to verify link"
-      );
     }
   };
 
@@ -151,6 +110,8 @@ const Login = () => {
                 {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
               </span>
             }
+            {...register("password")}
+            error={errors?.password?.message}
           />
           <div className="flex flex-col gap-0.5">
             {errors?.root?.message?.split(";").map((error) => (
@@ -159,7 +120,7 @@ const Login = () => {
               </p>
             ))}
           </div>
-          <Button className="w-full" disabled={isSubmitting}>
+          <Button className="w-full" type="submit" disabled={isSubmitting}>
             {isSubmitting ? <PulseLoader color="#fff" /> : <>Login</>}
           </Button>
         </form>

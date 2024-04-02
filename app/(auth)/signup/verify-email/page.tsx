@@ -76,7 +76,6 @@ const CreatePassword = () => {
         id: requestId ?? "",
       };
       const response = await onboardingService.verifyEmail(payload);
-      console.log(response);
       return response;
     },
     retry: false,
