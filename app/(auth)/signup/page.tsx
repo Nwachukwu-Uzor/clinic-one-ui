@@ -46,14 +46,19 @@ const Signup = () => {
       router.push("/signup/email-sent");
     } catch (error: any) {
       const errorData = error?.response?.data?.data?.errors;
-      toast.error(
-        error?.response?.data?.message ?? error?.message ?? "An error occurred"
-      );
+
       if (errorData) {
         const formattedValidationErrors = formatValidationErrors(
           errorData as Record<string, string[]>
         );
+        toast.error(formattedValidationErrors);
         setError("root", { type: "deps", message: formattedValidationErrors });
+      } else {
+        toast.error(
+          error?.response?.data?.data?.title ??
+            error?.message ??
+            "An error occurred"
+        );
       }
     }
   };
@@ -78,7 +83,7 @@ const Signup = () => {
           />
           <div className="flex flex-col gap-0.5">
             {errors?.root?.message?.split(";").map((error) => (
-              <p key={error} className="text-sm text-main-red">
+              <p key={error} className="text-sm text-red-500">
                 {error}
               </p>
             ))}

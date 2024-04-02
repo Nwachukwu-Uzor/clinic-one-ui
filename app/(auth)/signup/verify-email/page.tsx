@@ -4,7 +4,12 @@ import { TextInput } from "@/components/shared";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MdOutlineLock } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { IoEyeOutline, IoEyeOffOutline, IoAlertCircleOutline } from "react-icons/io5";
+import {
+  IoEyeOutline,
+  IoEyeOffOutline,
+  IoAlertCircleOutline,
+  IoCheckmark,
+} from "react-icons/io5";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
@@ -36,7 +41,7 @@ const CreatePassword = () => {
       };
       const response = await onboardingService.verifyEmail(payload);
       console.log(response);
-      return response?.data;
+      return response;
     },
     retry: false,
   });
@@ -86,7 +91,11 @@ const CreatePassword = () => {
       )}
       {data && (
         <div>
-          <Card className="shadow-md px-3 py-6">
+          <Alert variant="success">
+            <IoCheckmark className="h-4 w-4" />
+            <AlertTitle>{data?.message}</AlertTitle>
+          </Alert>
+          <Card className="shadow-md px-3 py-6 mt-3">
             <CardTitle className="text-lg">Create Password</CardTitle>
             <p className="leading-7 my-2 text-xs md:text-sm font-light">
               Please enter your desired password
