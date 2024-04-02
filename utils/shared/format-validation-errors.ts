@@ -6,5 +6,5 @@ export const formatValidationErrors = (
       return error;
     }
   });
-  return errors.join(",");
+  return errors.join(";");
 };

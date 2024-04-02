@@ -77,7 +77,7 @@ const Signup = () => {
             error={errors?.email?.message}
           />
           <div className="flex flex-col gap-0.5">
-            {errors?.root?.message?.split(",").map((error) => (
+            {errors?.root?.message?.split(";").map((error) => (
               <p key={error} className="text-sm text-main-red">
                 {error}
               </p>
