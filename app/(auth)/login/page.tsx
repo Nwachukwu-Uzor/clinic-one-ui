@@ -10,7 +10,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { PulseLoader } from "react-spinners";
-import { loginService } from "@/services";
+import { authService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
 import { toast } from "react-toastify";
 
@@ -45,7 +45,7 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
     try {
-      const response = await loginService.LoginPatient(values);
+      const response = await authService.LoginPatient(values);
       if (!response?.status) {
         toast.error(response?.message);
       }

@@ -1,2 +1,2 @@
 export { onboardingService } from "./onboarding-service";
-export { loginService } from "./login-service";
+export { authService } from "./auth-service";
