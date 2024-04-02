@@ -1,9 +1,5 @@
 import React from "react";
-import { TextInput } from "@/components/shared";
-import { Card, CardTitle } from "@/components/ui/card";
-import { MdOutlineMailOutline } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import { BsSend } from "react-icons/bs";
+import { Card } from "@/components/ui/card";
 import { SiMinutemailer } from "react-icons/si";
 
 const EmailSent = () => {

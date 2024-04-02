@@ -18,6 +18,18 @@ class OnboardingService {
     >(`${baseApiUrl}/Patients/VerifyPatientRegisterRequest`, data);
     return response?.data;
   }
+
+  async createPatientPassword(data: {
+    password: string;
+    confirmPassword: string;
+    patientRegisterationRequestId: string;
+  }) {
+    const response = await axios.post<APIResponseType<string>>(
+      `${baseApiUrl}/Patients/CreatePatientPassword`,
+      data
+    );
+    return response?.data;
+  }
 }
 
 export const onboardingService = new OnboardingService();

@@ -10,15 +10,51 @@ import {
   IoAlertCircleOutline,
   IoCheckmark,
 } from "react-icons/io5";
-import { useSearchParams } from "next/navigation";
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ClipLoader } from "react-spinners";
+import { ClipLoader, PulseLoader } from "react-spinners";
 import { VERIFY_EMAIL } from "@/constants";
 import { onboardingService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "react-toastify";
+import { BsSend } from "react-icons/bs";
 
+const schema = z
+  .object({
+    password: z
+      .string({
+        required_error: "Password is required",
+      })
+      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string({
+        required_error: "Password is required",
+      })
+      .min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+type FormFields = z.infer<typeof schema>;
 const CreatePassword = () => {
+  const router = useRouter();
+
+  const {
+    register,
+    setError,
+    handleSubmit,
+
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>({
+    resolver: zodResolver(schema),
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
@@ -69,6 +105,37 @@ const CreatePassword = () => {
     }
   };
 
+  const onSubmit: SubmitHandler<FormFields> = async (values) => {
+    try {
+      const payload = {
+        ...values,
+        patientRegisterationRequestId: data?.data?.id ?? "",
+      };
+      const response = await onboardingService.createPatientPassword(payload);
+      if (!response?.status) {
+        toast.error(response?.message);
+      }
+      toast.success(response?.message);
+      router.push("/login");
+    } catch (error: any) {
+      const errorData = error?.response?.data?.data?.errors;
+
+      if (errorData) {
+        const formattedValidationErrors = formatValidationErrors(
+          errorData as Record<string, string[]>
+        );
+        toast.error(formattedValidationErrors);
+        setError("root", { type: "deps", message: formattedValidationErrors });
+      } else {
+        toast.error(
+          error?.response?.data?.data?.title ??
+            error?.message ??
+            "An error occurred"
+        );
+      }
+    }
+  };
+
   return (
     <article className="w-[90%] max-w-[500px]">
       {isVerifying && (
@@ -100,7 +167,10 @@ const CreatePassword = () => {
             <p className="leading-7 my-2 text-xs md:text-sm font-light">
               Please enter your desired password
             </p>
-            <form className="mt-4 flex flex-col gap-2">
+            <form
+              className="mt-4 flex flex-col gap-2"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <TextInput
                 leftIcon={<MdOutlineLock className="text-purple-700" />}
                 placeholder="Password"
@@ -114,6 +184,9 @@ const CreatePassword = () => {
                     {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
                   </span>
                 }
+                {...register("password")}
+                error={errors?.password?.message}
+                disabled={isSubmitting}
               />
               <TextInput
                 leftIcon={<MdOutlineLock className="text-purple-700" />}
@@ -132,8 +205,24 @@ const CreatePassword = () => {
                     )}
                   </span>
                 }
+                {...register("confirmPassword")}
+                error={errors?.confirmPassword?.message}
+                disabled={isSubmitting}
               />
-              <Button className="w-full">Create Password</Button>
+              <div className="flex flex-col gap-0.5">
+                {errors?.root?.message?.split(";").map((error) => (
+                  <p key={error} className="text-sm text-red-500">
+                    {error}
+                  </p>
+                ))}
+              </div>
+              <Button className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <PulseLoader color="#fff" />
+                ) : (
+                  <>Create Password</>
+                )}
+              </Button>
             </form>
           </Card>
         </div>
