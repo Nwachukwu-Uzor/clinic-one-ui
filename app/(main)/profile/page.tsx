@@ -1,9 +1,11 @@
 "use client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { GET_PATIENT_DATA } from "@/constants";
 import { userService } from "@/services";
 import { formatAPIError } from "@/utils/shared";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import React from "react";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
@@ -16,17 +18,18 @@ const Profile = () => {
       const response = await userService.getProfileByUserId(token);
       return response;
     },
-    retry: 2
+    retry: 2,
   });
   return (
     <section>
-      <h3>Profile</h3>
-      {isLoading && (
+      <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0">
+        Profile
+      </h2>
+      {isLoading ? (
         <div className="min-h-[40vh] flex items-center justify-center">
           <ClipLoader color="#7e22ce" />
         </div>
-      )}
-      {isError ? (
+      ) : isError ? (
         <Alert variant="destructive">
           <IoAlertCircleOutline className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -40,8 +43,22 @@ const Profile = () => {
               ))}
           </AlertDescription>
         </Alert>
+      ) : data?.data ? (
+        <article></article>
       ) : (
-        <div></div>
+        <article className="min-h-[40vh] mt-4 bg-white flex items-center justify-center text-center">
+          <div>
+            <h3 className="scroll-m-20 text-2xl font-semibold text-gray-600 tracking-tight">
+              You have not completed your profile yet.
+            </h3>
+            <p className="leading-7 my-4">
+              Click the button below to get started.
+            </p>
+            <Link href="/profile/complete-profile">
+              <Button>Complete Profile</Button>
+            </Link>
+          </div>
+        </article>
       )}
     </section>
   );

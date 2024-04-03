@@ -112,6 +112,7 @@ const Login = () => {
             }
             {...register("password")}
             error={errors?.password?.message}
+            disabled={isSubmitting}
           />
           <div className="flex flex-col gap-0.5">
             {errors?.root?.message?.split(";").map((error) => (
