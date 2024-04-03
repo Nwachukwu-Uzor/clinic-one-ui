@@ -10,6 +10,13 @@ class AuthService {
     );
     return response?.data;
   }
+  async LoginStaff(data: { email: string; password: string }) {
+    const response = await axios.post<APIResponseType<{ token: string }>>(
+      `${baseApiUrl}/AppUser/LoginStaffUser`,
+      data
+    );
+    return response?.data;
+  }
 }
 
 export const authService = new AuthService();

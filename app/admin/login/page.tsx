@@ -45,7 +45,7 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
     try {
-      const response = await authService.LoginPatient(values);
+      const response = await authService.LoginStaff(values);
       if (!response?.status) {
         toast.error(response?.message);
       }
@@ -53,7 +53,6 @@ const Login = () => {
       sessionStorage.setItem("token", response?.data?.token);
       router.push("/dashboard");
     } catch (error: any) {
-      console.log(error?.response);
       const errorData = error?.response?.data?.data?.errors;
 
       if (errorData) {
@@ -82,10 +81,12 @@ const Login = () => {
   return (
     <article className="w-[90%] max-w-[500px]">
       <Card className="shadow-md px-3 py-6 mt-3">
-        <CardTitle className="text-lg">Login</CardTitle>
-        <p className="leading-7 my-2 text-xs md:text-sm font-light">
-          Please provide your credentials to login
-        </p>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <CardTitle className="text-lg">Login</CardTitle>
+          <p className="leading-7 text-xs md:text-sm font-light">
+            Please provide your admin credentials to login
+          </p>
+        </div>
         <form
           className="mt-4 flex flex-col gap-2"
           onSubmit={handleSubmit(onSubmit)}
