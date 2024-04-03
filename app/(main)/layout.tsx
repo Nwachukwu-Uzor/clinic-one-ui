@@ -66,7 +66,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
       </aside>
-      <section className="border flex-1 bg-gray-100 min-h-screen">
+      <section className="border flex-1 bg-gray-100 h-screen overflow-auto">
         <header className="bg-white h-12 flex items-center px-2 shadow-sm border-b-[0.5px]">
           <div>
             Header <button onClick={toggleSidebarOpen}>Open</button>
