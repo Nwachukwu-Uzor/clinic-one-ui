@@ -21,7 +21,6 @@ import { onboardingService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "react-toastify";
-import { BsSend } from "react-icons/bs";
 
 const schema = z
   .object({

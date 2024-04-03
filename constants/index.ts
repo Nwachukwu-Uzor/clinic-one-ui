@@ -1,1 +1,1 @@
-export { VERIFY_EMAIL } from "./query-keys";
+export { VERIFY_EMAIL, GET_PATIENT_DATA } from "./query-keys";
