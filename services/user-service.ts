@@ -6,7 +6,7 @@ import axios from "axios";
 class UserService {
   async getProfileByUserId(token: string) {
     const response = await axios.get<APIResponseType<PatientType>>(
-      `${baseApiUrl}/Patients/GetPatientDetailsByAppUserIdD`,
+      `${baseApiUrl}/Patients/GetPatientDetailsByAppUserId`,
       {
         headers: {
           Authorization: "Bearer " + token,

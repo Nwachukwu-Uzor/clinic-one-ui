@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { date, z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,7 @@ import { bloodGroups, countries, genotypes } from "@/data";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { formatValidationErrors } from "@/utils/shared";
+import { decodeToken, formatValidationErrors } from "@/utils/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { onboardingService } from "@/services";
 import {
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDate } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { SelectSingleEventHandler } from "react-day-picker";
 import { GET_PATIENT_DATA } from "@/constants";
@@ -45,13 +45,13 @@ const schema = z.object({
     .min(2, "Phone number is required"),
   address: z
     .string({ required_error: "Address is required" })
-    .min(2, "Phone number is required"),
+    .min(2, "Address is required"),
   bloodGroup: z
     .string({ required_error: "Blood Group is required" })
-    .min(2, "Phone number is required"),
+    .min(2, "Blood group is required"),
   genotype: z
     .string({ required_error: "Genotype is required" })
-    .min(2, "Phone number is required"),
+    .min(1, "Genotype is required"),
   dateOfBirth: z.date({ required_error: "Date of Birth is required" }),
 });
 
@@ -74,19 +74,24 @@ const Page = () => {
   const [countryInput, dateOfBirth] = watch(["country", "dateOfBirth"]);
   const country = countryInput?.length > 0 ? JSON.parse(countryInput) : null;
 
-  const handleDateChange = (date?: Date) => {
-    if (date) {
-      setValue("dateOfBirth", date);
+  const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value) {
+      setValue("dateOfBirth", new Date(event.target.value));
     }
   };
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
+    const token = sessionStorage.getItem("token") as string;
+    const decoded = decodeToken(token);
     try {
-      const token = sessionStorage.getItem("token") as string;
       const response = await onboardingService.completePatientDetails(
         {
           ...values,
-          phoneNumber: `${country?.code_dial ?? ""}${values?.phoneNumber}`
+          country: country.name,
+          phoneNumber: `${
+            country?.dial_code ?? ""
+          }${values?.phoneNumber.trim()}`,
+          appUserId: decoded.Id,
         },
         token
       );
@@ -96,6 +101,7 @@ const Page = () => {
       }
       toast.success(response?.message);
       queryClient.invalidateQueries({ queryKey: [GET_PATIENT_DATA] });
+      router.push("/profile");
     } catch (error: any) {
       console.log(error?.response);
       const errorData = error?.response?.data?.data?.errors;
@@ -171,7 +177,7 @@ const Page = () => {
               {errors?.country?.message}
             </p>
           </div>
-          <div className="flex flex-col gap-1.5">
+          {/* <div className="flex flex-col gap-1.5">
             <label className="text-sm">Genotype: </label>
             <Popover>
               <PopoverTrigger asChild>
@@ -198,7 +204,13 @@ const Page = () => {
             <p className="h-1 mt-0.5 text-red-500 text-xs">
               {errors?.dateOfBirth?.message}
             </p>
-          </div>
+          </div> */}
+          <TextInput
+            type="date"
+            label="Date of Birth"
+            value={dateOfBirth?.toString() ?? Date.now().toString()}
+            onChange={handleDateChange}
+          />
           <TextInput
             label="Phone"
             {...register("phoneNumber")}
@@ -261,7 +273,7 @@ const Page = () => {
           ))}
         </div>
         <Button className="w-[50%] max-w-[150px]" disabled={isSubmitting}>
-          {isSubmitting ? <PulseLoader /> : "Submit"}
+          {isSubmitting ? <PulseLoader color="#fff" /> : "Submit"}
         </Button>
       </form>
     </section>

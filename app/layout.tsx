@@ -24,10 +24,10 @@ export default function RootLayout({
         <Provider>
           {children}
           <ToastContainer />
-          {/* <ReactQueryDevtools
+          <ReactQueryDevtools
               initialIsOpen={false}
               buttonPosition="bottom-left"
-            /> */}
+            />
         </Provider>
       </body>
     </html>

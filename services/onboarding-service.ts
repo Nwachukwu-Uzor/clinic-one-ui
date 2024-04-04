@@ -33,7 +33,9 @@ class OnboardingService {
   }
 
   async completePatientDetails(
-    data: Partial<Omit<PatientType, "id" | "patientID" | "appUser">>,
+    data: Partial<Omit<PatientType, "id" | "patientID">> & {
+      appUserId: string;
+    },
     token: string
   ) {
     const response = await axios.post<APIResponseType<PatientType>>(
