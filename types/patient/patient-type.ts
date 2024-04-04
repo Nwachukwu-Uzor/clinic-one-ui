@@ -6,7 +6,7 @@ export type PatientType = {
   firstName: string;
   lastName: string;
   middleName?: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   address: string;
   genotype: string;
   bloodGroup: string;

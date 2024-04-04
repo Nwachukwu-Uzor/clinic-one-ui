@@ -46,7 +46,7 @@ const Profile = () => {
       ) : data?.data ? (
         <article></article>
       ) : (
-        <article className="min-h-[40vh] mt-4 bg-white flex items-center justify-center text-center">
+        <article className="min-h-[40vh] mt-4 bg-white flex items-center justify-center text-center rounded-md">
           <div>
             <h3 className="scroll-m-20 text-2xl font-semibold text-gray-600 tracking-tight">
               You have not completed your profile yet.

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { z } from "zod";
+import { date, z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -11,38 +11,91 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { formatValidationErrors } from "@/utils/shared";
+import { useQueryClient } from "@tanstack/react-query";
+import { onboardingService } from "@/services";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { SelectSingleEventHandler } from "react-day-picker";
+import { GET_PATIENT_DATA } from "@/constants";
 
 const schema = z.object({
-  firstName: z.string({
-    required_error: "First name required",
-  }),
-  lastName: z.string({
-    required_error: "Last name is required",
-  }),
+  firstName: z
+    .string({
+      required_error: "First name required",
+    })
+    .min(2, "First name must be at least 2 characters"),
+  lastName: z
+    .string({
+      required_error: "Last name is required",
+    })
+    .min(2, "Last name must be at least 2 characters"),
   middleName: z.optional(z.string()),
-  country: z.string({ required_error: "Country is required" }),
-  phoneNumber: z.string({ required_error: "Phone number is required" }),
-  address: z.string({ required_error: "Address is required" }),
-  bloodGroup: z.string({ required_error: "Blood Group is required" }),
-  genotype: z.string({ required_error: "Genotype is required" }),
+  country: z
+    .string({ required_error: "Country is required" })
+    .min(2, "Country is required"),
+  phoneNumber: z
+    .string({ required_error: "Phone number is required" })
+    .min(2, "Phone number is required"),
+  address: z
+    .string({ required_error: "Address is required" })
+    .min(2, "Phone number is required"),
+  bloodGroup: z
+    .string({ required_error: "Blood Group is required" })
+    .min(2, "Phone number is required"),
+  genotype: z
+    .string({ required_error: "Genotype is required" })
+    .min(2, "Phone number is required"),
+  dateOfBirth: z.date({ required_error: "Date of Birth is required" }),
 });
 
 type FormFields = z.infer<typeof schema>;
 
 const Page = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const {
     register,
     setError,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
   });
 
+  const [countryInput, dateOfBirth] = watch(["country", "dateOfBirth"]);
+  const country = countryInput?.length > 0 ? JSON.parse(countryInput) : null;
+
+  const handleDateChange = (date?: Date) => {
+    if (date) {
+      setValue("dateOfBirth", date);
+    }
+  };
+
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
     try {
-      console.log(values);
+      const token = sessionStorage.getItem("token") as string;
+      const response = await onboardingService.completePatientDetails(
+        {
+          ...values,
+          phoneNumber: `${country?.code_dial ?? ""}${values?.phoneNumber}`
+        },
+        token
+      );
+
+      if (!response?.status) {
+        toast.error(response?.message);
+      }
+      toast.success(response?.message);
+      queryClient.invalidateQueries({ queryKey: [GET_PATIENT_DATA] });
     } catch (error: any) {
       console.log(error?.response);
       const errorData = error?.response?.data?.data?.errors;
@@ -82,7 +135,7 @@ const Page = () => {
         <p className="leading-7 my-4">
           Please fill in this form to complete your profile.
         </p>
-        <div className="grid lg:grid-cols-2 gap-2">
+        <div className="grid lg:grid-cols-2 gap-x-2 gap-y-4">
           <TextInput
             label="First Name"
             {...register("firstName")}
@@ -107,6 +160,7 @@ const Page = () => {
               {...register("country")}
               disabled={isSubmitting}
             >
+              <option value="">-- Please select a country --</option>
               {countries.map((country) => (
                 <option key={country.code} value={JSON.stringify(country)}>
                   {country.name}
@@ -117,11 +171,44 @@ const Page = () => {
               {errors?.country?.message}
             </p>
           </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm">Genotype: </label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-auto",
+                    !dateOfBirth && "text-muted-foreground bg-gray-100"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dateOfBirth}
+                  onSelect={(val) => handleDateChange(val)}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="h-1 mt-0.5 text-red-500 text-xs">
+              {errors?.dateOfBirth?.message}
+            </p>
+          </div>
           <TextInput
             label="Phone"
             {...register("phoneNumber")}
             error={errors?.phoneNumber?.message}
             disabled={isSubmitting}
+            leftIcon={
+              <span className="text-[10px] inline-flex  justify-center items-center w-5 font-semibold">
+                {country ? country?.dial_code : "--"}
+              </span>
+            }
           />
           <TextInput
             label="Address"
@@ -130,12 +217,13 @@ const Page = () => {
             disabled={isSubmitting}
           />
           <div className="flex flex-col gap-1.5">
-            <Label>Genotype: </Label>
+            <label className="text-sm font-semibold">Genotype: </label>
             <select
-              className="relative w-full bg-gray-100 py-1.5 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-fade"
+              className="relative w-full bg-gray-100 py-2 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-fade font-size"
               {...register("genotype")}
               disabled={isSubmitting}
             >
+              <option value="">-- Please select a genotype --</option>
               {genotypes.map((genotype) => (
                 <option key={genotype.id} value={genotype.value}>
                   {genotype.label}
@@ -147,12 +235,13 @@ const Page = () => {
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label>Blood Group: </Label>
+            <label className="text-sm font-semibold">Blood Group: </label>
             <select
-              className="relative w-full bg-gray-100 py-1.5 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-fade"
+              className="relative w-full bg-gray-100 py-2 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-gray-400 text-gray-500"
               {...register("bloodGroup")}
               disabled={isSubmitting}
             >
+              <option value="">-- Please select a blood group --</option>
               {bloodGroups.map((bloodGroup) => (
                 <option key={bloodGroup.id} value={bloodGroup.value}>
                   {bloodGroup.label}
@@ -164,14 +253,14 @@ const Page = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5 my-4">
           {errors?.root?.message?.split(";").map((error) => (
             <p key={error} className="text-sm text-red-500">
               {error}
             </p>
           ))}
         </div>
-        <Button className="mt-3 w-[50%] max-w-[150px]" disabled={isSubmitting}>
+        <Button className="w-[50%] max-w-[150px]" disabled={isSubmitting}>
           {isSubmitting ? <PulseLoader /> : "Submit"}
         </Button>
       </form>

@@ -48,7 +48,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <GiHospitalCross className="text-4xl text-purple-800" />
             </div>
             {/* <button onClick={toggleSidebarOpen}>Close</button> */}
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-2 mt-6">
               {navLinks.map((link) => (
                 <li key={link.id}>
                   <Link
