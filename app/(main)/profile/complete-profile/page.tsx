@@ -41,7 +41,9 @@ const schema = z.object({
   genotype: z
     .string({ required_error: "Genotype is required" })
     .min(1, "Genotype is required"),
-  dateOfBirth: z.date({ required_error: "Date of Birth is required" }),
+  dateOfBirth: z
+    .string({ required_error: "Date of Birth is required" })
+    .min(2, "Date of Birth is required"),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -60,14 +62,8 @@ const Page = () => {
     resolver: zodResolver(schema),
   });
 
-  const [countryInput, dateOfBirth] = watch(["country", "dateOfBirth"]);
+  const [countryInput] = watch(["country"]);
   const country = countryInput?.length > 0 ? JSON.parse(countryInput) : null;
-
-  const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value) {
-      setValue("dateOfBirth", new Date(event.target.value));
-    }
-  };
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
     const token = sessionStorage.getItem(TOKEN_KEY) as string;
@@ -81,6 +77,7 @@ const Page = () => {
             country?.dial_code ?? ""
           }${values?.phoneNumber.trim()}`,
           appUserId: decoded.Id,
+          dateOfBirth: new Date(values.dateOfBirth)
         },
         token
       );
@@ -166,39 +163,12 @@ const Page = () => {
               {errors?.country?.message}
             </p>
           </div>
-          {/* <div className="flex flex-col gap-1.5">
-            <label className="text-sm">Genotype: </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-auto",
-                    !dateOfBirth && "text-muted-foreground bg-gray-100"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateOfBirth}
-                  onSelect={(val) => handleDateChange(val)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <p className="h-1 mt-0.5 text-red-500 text-xs">
-              {errors?.dateOfBirth?.message}
-            </p>
-          </div> */}
+
           <TextInput
             type="date"
             label="Date of Birth"
-            value={dateOfBirth?.toString() ?? Date.now().toString()}
-            onChange={handleDateChange}
+            {...register("dateOfBirth")}
+            error={errors?.dateOfBirth?.message}
           />
           <TextInput
             label="Phone"

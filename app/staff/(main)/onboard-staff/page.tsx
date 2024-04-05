@@ -98,13 +98,12 @@ const Page = () => {
   });
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
-    console.log(values);
-
     try {
       const response = await staffService.onboardStaff({
         ...values,
         country: country.name,
         phoneNumber: `${country?.dial_code ?? ""}${values?.phoneNumber.trim()}`,
+        dateOfBirth: new Date(values.dateOfBirth),
       });
 
       if (!response?.status) {

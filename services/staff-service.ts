@@ -59,14 +59,12 @@ export class StaffService {
       email: string;
       jobId: string;
       departmentId: string;
+      dateOfBirth: Date;
     }
   ) {
     const response = await axios.post<APIResponseType<string>>(
       `${baseApiUrl}/Staff/OnboardStaff`,
-      {
-        ...data,
-        dateOfBirth: new Date(data.dateOfBirth),
-      },
+      data,
       {
         headers: {
           Authorization: this._accessHeader,

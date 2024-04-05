@@ -6,7 +6,7 @@ export type StaffType = {
   firstName: string;
   lastName: string;
   middleName?: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   address: string;
   appUser: AppUserType;
   job: JobType;
@@ -14,4 +14,3 @@ export type StaffType = {
   country: string;
   phoneNumber: string;
 };
-
