@@ -3,6 +3,7 @@ import { APIResponseType, PaginatedResponseType } from "@/types/shared";
 import { DepartmentType, JobType } from "@/types/staff";
 import { StaffType } from "@/types/staff/staff-type";
 import axios from "axios";
+import { format } from "date-fns";
 
 export class StaffService {
   private _accessHeader: string;
@@ -44,6 +45,28 @@ export class StaffService {
   async getJobForDepartment(departmentId: string) {
     const response = await axios.get<APIResponseType<JobType[]>>(
       `${baseApiUrl}/Departments/GetAllJobsByDepartmentId/${departmentId}`,
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async onboardStaff(
+    data: Omit<StaffType, "job" | "staffID" | "appUser" | "id"> & {
+      email: string;
+      jobId: string;
+      departmentId: string;
+    }
+  ) {
+    const response = await axios.post<APIResponseType<string>>(
+      `${baseApiUrl}/Staff/OnboardStaff`,
+      {
+        ...data,
+        dateOfBirth: new Date(data.dateOfBirth),
+      },
       {
         headers: {
           Authorization: this._accessHeader,

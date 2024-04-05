@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import {
   GET_ALL_DEPARTMENTS,
   GET_ALL_JOBS_FOR_DEPARTMENT,
+  GET_STAFF_LIST,
   TOKEN_KEY,
 } from "@/constants";
 
@@ -45,13 +46,15 @@ const schema = z.object({
   address: z
     .string({ required_error: "Address is required" })
     .min(2, "Address is required"),
-  department: z
+  departmentId: z
     .string({ required_error: "Department is required" })
     .min(2, "Department is required"),
-  job: z
+  jobId: z
     .string({ required_error: "Job is required" })
     .min(2, "Job is required"),
-  dateOfBirth: z.string({ required_error: "Date of Birth is required" }),
+  dateOfBirth: z
+    .string({ required_error: "Date of Birth is required" })
+    .min(2, "Date of Birth is required"),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -74,17 +77,13 @@ const Page = () => {
     setError,
     handleSubmit,
     watch,
-    setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
   });
 
-  const [countryInput, department] = watch([
-    "country",
-    "dateOfBirth",
-    "department",
-  ]);
+  const [countryInput, department] = watch(["country", "departmentId"]);
   const country = countryInput?.length > 0 ? JSON.parse(countryInput) : null;
 
   const { data: jobs, isLoading: isLoadingJobs } = useQuery({
@@ -98,39 +97,22 @@ const Page = () => {
     },
   });
 
-  const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value) {
-      setValue(
-        "dateOfBirth",
-        format(new Date(event.target.value), "mm/dd/yyyy")
-      );
-    }
-  };
-
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
-    const token = sessionStorage.getItem(TOKEN_KEY) as string;
-    const decoded = decodeToken(token);
     console.log(values);
 
     try {
-      // const response = await onboardingService.completePatientDetails(
-      //   {
-      //     ...values,
-      //     country: country.name,
-      //     phoneNumber: `${
-      //       country?.dial_code ?? ""
-      //     }${values?.phoneNumber.trim()}`,
-      //     appUserId: decoded.Id,
-      //   },
-      //   token
-      // );
+      const response = await staffService.onboardStaff({
+        ...values,
+        country: country.name,
+        phoneNumber: `${country?.dial_code ?? ""}${values?.phoneNumber.trim()}`,
+      });
 
-      // if (!response?.status) {
-      //   toast.error(response?.message);
-      // }
-      // toast.success(response?.message);
-      // queryClient.invalidateQueries({ queryKey: [GET_PATIENT_DATA] });
-      router.push("/profile");
+      if (!response?.status) {
+        toast.error(response?.message);
+      }
+      toast.success(response?.message);
+      queryClient.invalidateQueries({ queryKey: [GET_STAFF_LIST] });
+      reset();
     } catch (error: any) {
       console.log(error?.response);
       const errorData = error?.response?.data?.data?.errors;
@@ -218,6 +200,7 @@ const Page = () => {
             // value={dateOfBirth}
             // onChange={handleDateChange}
             {...register("dateOfBirth")}
+            error={errors?.dateOfBirth?.message}
           />
           <TextInput
             label="Phone"
@@ -240,7 +223,7 @@ const Page = () => {
             <label className="text-sm font-semibold">Department: </label>
             <select
               className="relative w-full bg-gray-100 py-2 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-fade font-size"
-              {...register("department")}
+              {...register("departmentId")}
               disabled={isSubmitting || isLoadingDepartments}
             >
               <option value="">
@@ -256,14 +239,14 @@ const Page = () => {
                 ))}
             </select>
             <p className="h-1 mt-0.5 text-red-500 text-xs">
-              {errors?.department?.message}
+              {errors?.departmentId?.message}
             </p>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold">Job: </label>
             <select
               className="relative w-full bg-gray-100 py-2 px-2 border-none outline-none focus:border-none focus:outline-none focus:ring-[0.5px] focus:ring-purple-600 rounded-md duration-50 placeholder:opacity-70 placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-70 placeholder:text-fade font-size"
-              {...register("job")}
+              {...register("jobId")}
               disabled={isSubmitting || isLoadingDepartments}
             >
               <option value="">
@@ -277,7 +260,7 @@ const Page = () => {
                 ))}
             </select>
             <p className="h-1 mt-0.5 text-red-500 text-xs">
-              {errors?.job?.message}
+              {errors?.jobId?.message}
             </p>
           </div>
         </div>
