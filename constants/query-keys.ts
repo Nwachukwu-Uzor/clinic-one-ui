@@ -1,2 +1,3 @@
 export const VERIFY_EMAIL = "VERIFY_EMAIL";
 export const GET_PATIENT_DATA = "GET_PATIENT_DATA";
+export const GET_STAFF_LIST = "GET_STAFF_LIST";

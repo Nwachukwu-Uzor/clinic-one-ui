@@ -1,28 +1,17 @@
 "use client";
 import React, { ChangeEvent } from "react";
-import { date, z } from "zod";
+import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { PulseLoader } from "react-spinners";
 import { TextInput } from "@/components/shared";
 import { bloodGroups, countries, genotypes } from "@/data";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { decodeToken, formatValidationErrors } from "@/utils/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { onboardingService } from "@/services";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { format, formatDate } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { SelectSingleEventHandler } from "react-day-picker";
 import { GET_PATIENT_DATA, TOKEN_KEY } from "@/constants";
 
 const schema = z.object({
