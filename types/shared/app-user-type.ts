@@ -1,5 +1,5 @@
 export type AppUserType = {
   email: string;
   id: string;
-  roles: string[] | string;
+  roles: {id: string, name: string}[];
 };

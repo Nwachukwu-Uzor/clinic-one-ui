@@ -1,10 +1,14 @@
 import { TOKEN_KEY } from "@/constants";
+import { TokenType } from "@/types/shared";
+import { decodeToken } from "@/utils/shared";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export const useAuth = (redirectUrl: string) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<TokenType | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -14,8 +18,11 @@ export const useAuth = (redirectUrl: string) => {
       toast.warn("Unauthorized access. Please login to continue");
     } else {
       setIsLoading(false);
-    }
-  }, [setIsLoading, router, redirectUrl]);
+      const user = decodeToken(token);
 
-  return { isLoading };
+      setUser(user);
+    }
+  }, [router, redirectUrl]);
+
+  return { isLoading, user };
 };

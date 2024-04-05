@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MdMenuOpen } from "react-icons/md";
 import { GiHospitalCross } from "react-icons/gi";
-import { FaCircleUser } from "react-icons/fa6";
+import { FaCircleUser, FaUsers } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 import { BiSolidDashboard } from "react-icons/bi";
 import { RiLogoutCircleLine } from "react-icons/ri";
@@ -12,7 +12,9 @@ import { useAuth } from "@/hooks";
 import { ClipLoader } from "react-spinners";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading } = useAuth("/login");
+  const { isLoading, user } = useAuth("/staff/login");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   let navLinks = [
     {
       id: 1,
@@ -21,7 +23,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <BiSolidDashboard /> Dashboard
         </>
       ),
-      to: "/dashboard",
+      to: "/staff/dashboard",
     },
     {
       id: 2,
@@ -30,13 +32,25 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <FaCircleUser /> Profile
         </>
       ),
-      to: "/profile",
+      to: "/staff/profile",
     },
   ];
 
-  
- 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  if (user) {
+    if (
+      typeof user.role === "object" &&
+      user.role.find((role) => role.toUpperCase() === "ADMIN")
+    )
+      navLinks.splice(1, 0, {
+        id: 3,
+        content: (
+          <>
+            <FaUsers /> All Staff
+          </>
+        ),
+        to: "/staff/all-staff",
+      });
+  }
 
   const toggleSidebarOpen = () => {
     setSidebarOpen((opened) => !opened);

@@ -52,7 +52,7 @@ const Login = () => {
       }
       toast.success(response?.message);
       sessionStorage.setItem(TOKEN_KEY, response?.data?.token);
-      router.push("/dashboard");
+      router.push("/staff/dashboard");
     } catch (error: any) {
       const errorData = error?.response?.data?.data?.errors;
 
