@@ -1,30 +1,33 @@
 "use client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
-import { TOKEN_KEY } from "@/constants";
-import { GET_STAFF_LIST } from "@/constants/query-keys";
+import { GET_STAFF_LIST, TOKEN_KEY } from "@/constants";
 import { StaffService } from "@/services";
 import { StaffType } from "@/types/staff/staff-type";
 import { formatAPIError } from "@/utils/shared";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
 
 const AllStaff = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const searchParam = useSearchParams();
+
+  const pageNumber =
+    Number(searchParam.get("page")) > 0 ? Number(searchParam.get("page")) : 1;
 
   const token = sessionStorage.getItem(TOKEN_KEY);
   const staffService = new StaffService(token);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: [GET_STAFF_LIST, currentPage],
+    queryKey: [GET_STAFF_LIST, pageNumber],
     queryFn: async () => {
-      const response = await staffService.getStaffList(currentPage);
+      const response = await staffService.getStaffList(pageNumber);
       return response;
     },
   });
@@ -59,6 +62,10 @@ const AllStaff = () => {
     },
   ];
 
+  const handlePaginate = (page: number) => {
+    router.push(`/staff/all-staff?page=${page}`);
+  };
+
   return (
     <section>
       {isLoading ? (
@@ -86,11 +93,10 @@ const AllStaff = () => {
               All Staff
             </h2>
           </div>
-          {/* {JSON.stringify(data)} */}
           <div className="my-2">
             <div className="flex justify-end my-4">
               <Button>
-                <Link href="/staff/onboard" className="text-sm font-medium">
+                <Link href="/staff/onboard-staff" className="text-sm font-medium">
                   Onboard New Staff
                 </Link>
               </Button>
@@ -98,17 +104,32 @@ const AllStaff = () => {
             {data.data.length > 0 ? (
               <div className=" bg-white">
                 <DataTable columns={columns} data={data.data} />
-                <div className="mt-2 flex items-center ga-p-2">
-                  <ul>
-                    {new Array(data.pageSize)
+                <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                  <ul className="flex items-center border border-purple-600 my-1 rounded-sm">
+                    {new Array(data.totalPages)
                       .fill("")
                       .map((_data, i) => i + 1)
                       .map((page) => (
-                        <li key={page}>
-                          <button>{page}</button>
+                        <li
+                          key={page}
+                          className={`py-1 px-2 text-sm font-semibold [&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-purple-600 duration-100 ease ${
+                            pageNumber === page
+                              ? "bg-purple-600 text-white"
+                              : "bg-transparent text-purple-600"
+                          }`}
+                        >
+                          <button onClick={() => handlePaginate(page)}>
+                            {page}
+                          </button>
                         </li>
                       ))}
                   </ul>
+                  <div>
+                    <h4 className="font-medium text-gray-600 text-sm">
+                      Total Staff Count:{" "}
+                      <span className="font-normal">{data.totalRecords}</span>
+                    </h4>
+                  </div>
                 </div>
               </div>
             ) : (

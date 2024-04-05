@@ -3,5 +3,5 @@ export type PaginatedResponseType<T> = {
   pageSize: number;
   totalRecords: number;
   currentPage: number;
-  totalPage: number;
+  totalPages: number;
 };

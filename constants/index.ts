@@ -1,2 +1,8 @@
-export { VERIFY_EMAIL, GET_PATIENT_DATA } from "./query-keys";
+export {
+  VERIFY_EMAIL,
+  GET_PATIENT_DATA,
+  GET_ALL_DEPARTMENTS,
+  GET_ALL_JOBS_FOR_DEPARTMENT,
+  GET_STAFF_LIST,
+} from "./query-keys";
 export const TOKEN_KEY = "CLINIC_ONE_AUTH_TOKEN";

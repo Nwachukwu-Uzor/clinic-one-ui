@@ -1,5 +1,6 @@
 import { baseApiUrl } from "@/config";
 import { APIResponseType, PaginatedResponseType } from "@/types/shared";
+import { DepartmentType, JobType } from "@/types/staff";
 import { StaffType } from "@/types/staff/staff-type";
 import axios from "axios";
 
@@ -26,5 +27,29 @@ export class StaffService {
     );
 
     return response.data.data;
+  }
+
+  async getAllDepartments() {
+    const response = await axios.get<APIResponseType<DepartmentType[]>>(
+      `${baseApiUrl}/Departments/GetAll`,
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async getJobForDepartment(departmentId: string) {
+    const response = await axios.get<APIResponseType<JobType[]>>(
+      `${baseApiUrl}/Departments/GetAllJobsByDepartmentId/${departmentId}`,
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+    return response.data;
   }
 }
