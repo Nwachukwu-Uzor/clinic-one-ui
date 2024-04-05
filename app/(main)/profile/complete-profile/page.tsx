@@ -23,7 +23,7 @@ import { CalendarIcon } from "lucide-react";
 import { format, formatDate } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { SelectSingleEventHandler } from "react-day-picker";
-import { GET_PATIENT_DATA } from "@/constants";
+import { GET_PATIENT_DATA, TOKEN_KEY } from "@/constants";
 
 const schema = z.object({
   firstName: z
@@ -81,7 +81,7 @@ const Page = () => {
   };
 
   const onSubmit: SubmitHandler<FormFields> = async (values) => {
-    const token = sessionStorage.getItem("token") as string;
+    const token = sessionStorage.getItem(TOKEN_KEY) as string;
     const decoded = decodeToken(token);
     try {
       const response = await onboardingService.completePatientDetails(

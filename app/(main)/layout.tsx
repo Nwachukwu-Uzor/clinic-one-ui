@@ -8,8 +8,11 @@ import { IoMdClose } from "react-icons/io";
 import { BiSolidDashboard } from "react-icons/bi";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import Link from "next/link";
+import { useAuth } from "@/hooks";
+import { ClipLoader } from "react-spinners";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+  const { isLoading } = useAuth("/login");
   const navLinks = [
     {
       id: 1,
@@ -36,7 +39,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     setSidebarOpen((opened) => !opened);
   };
 
-  return (
+  return isLoading ? (
+    <div className="h-screen flex items-center justify-center">
+      <ClipLoader color="#7e22ce" />
+    </div>
+  ) : (
     <main className="flex relative">
       <aside
         className={`fixed ${

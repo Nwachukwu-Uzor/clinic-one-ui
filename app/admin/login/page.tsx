@@ -13,6 +13,7 @@ import { PulseLoader } from "react-spinners";
 import { authService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
 import { toast } from "react-toastify";
+import { TOKEN_KEY } from "@/constants";
 
 const schema = z.object({
   email: z.string({
@@ -50,7 +51,7 @@ const Login = () => {
         toast.error(response?.message);
       }
       toast.success(response?.message);
-      sessionStorage.setItem("token", response?.data?.token);
+      sessionStorage.setItem(TOKEN_KEY, response?.data?.token);
       router.push("/dashboard");
     } catch (error: any) {
       const errorData = error?.response?.data?.data?.errors;

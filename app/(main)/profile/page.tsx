@@ -2,7 +2,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GET_PATIENT_DATA } from "@/constants";
+import { GET_PATIENT_DATA, TOKEN_KEY } from "@/constants";
 import { userService } from "@/services";
 import { formatAPIError } from "@/utils/shared";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ const Profile = () => {
   const { isLoading, data, isError, error } = useQuery({
     queryKey: [GET_PATIENT_DATA],
     queryFn: async () => {
-      const token = sessionStorage.getItem("token") as string;
+      const token = sessionStorage.getItem(TOKEN_KEY) as string;
       const response = await userService.getProfileByUserId(token);
       return response;
     },
