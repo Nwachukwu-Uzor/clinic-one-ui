@@ -41,15 +41,28 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       typeof user.role === "object" &&
       user.role.find((role) => role.toUpperCase() === "ADMIN")
     )
-      navLinks.splice(1, 0, {
-        id: 3,
-        content: (
-          <>
-            <FaUsers /> All Staff
-          </>
-        ),
-        to: "/staff/all-staff",
-      });
+      navLinks.splice(
+        1,
+        0,
+        {
+          id: 3,
+          content: (
+            <>
+              <FaUsers /> All Staff
+            </>
+          ),
+          to: "/staff/all-staff",
+        },
+        {
+          id: 4,
+          content: (
+            <>
+              <FaUsers /> Patients
+            </>
+          ),
+          to: "/staff/patients",
+        }
+      );
   }
 
   const toggleSidebarOpen = () => {
