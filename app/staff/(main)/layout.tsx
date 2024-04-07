@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MdMenuOpen } from "react-icons/md";
-import { GiHospitalCross } from "react-icons/gi";
+import { GiHospitalCross, GiPlayerTime } from "react-icons/gi";
 import { FaCircleUser, FaUsers } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 import { BiSolidDashboard } from "react-icons/bi";
@@ -61,6 +61,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </>
           ),
           to: "/staff/patients",
+        },
+        {
+          id: 4,
+          content: (
+            <>
+              <GiPlayerTime /> Appointments
+            </>
+          ),
+          to: "/staff/appointments",
         }
       );
   }

@@ -4,5 +4,6 @@ export {
   GET_ALL_DEPARTMENTS,
   GET_ALL_JOBS_FOR_DEPARTMENT,
   GET_STAFF_LIST,
+  GET_ALL_DOCTORS
 } from "./query-keys";
 export const TOKEN_KEY = "CLINIC_ONE_AUTH_TOKEN";
