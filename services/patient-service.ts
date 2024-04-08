@@ -4,7 +4,7 @@ import { APIResponseType, PaginatedResponseType } from "@/types/shared";
 import axios from "axios";
 
 export class PatientService {
-    private _accessHeader: string;
+  private _accessHeader: string;
 
   constructor(accessToken: string | null) {
     if (!accessToken) {
@@ -26,5 +26,17 @@ export class PatientService {
     );
 
     return response.data.data;
+  }
+
+  async getPatientByPatientID(patientID: string) {
+    const response = await axios.get<APIResponseType<PatientType>>(
+      `${baseApiUrl}/Patients/GetPatientDetailsByPatientID/${patientID}`,
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+    return response.data;
   }
 }

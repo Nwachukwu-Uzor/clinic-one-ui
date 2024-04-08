@@ -31,8 +31,9 @@ export class AppointmentService {
 
   async creatAnAppointment(data: {
     doctorId: string;
-    patientID: string;
-    appointmentTime: string;
+    patientId: string;
+    appointmentTime: Date;
+    description?: string;
   }) {
     const response = await axios.post<APIResponseType<string>>(
       `${baseApiUrl}/Appointments/CreateAppointment`,
