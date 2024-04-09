@@ -1,3 +1,4 @@
+"use client";
 import { TOKEN_KEY } from "@/constants";
 import { TokenType } from "@/types/shared";
 import { decodeToken } from "@/utils/shared";
@@ -18,7 +19,7 @@ export const useAuth = (redirectUrl: string) => {
       toast.warn("Unauthorized access. Please login to continue");
     } else {
       setIsLoading(false);
-      const user = decodeToken(token);
+      const user = decodeToken(token) as TokenType;
 
       setUser(user);
     }
