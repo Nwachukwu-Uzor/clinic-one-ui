@@ -32,7 +32,7 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-export const Page = () => {
+const Page = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const { user } = useAuth("/login");
 
