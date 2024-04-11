@@ -10,9 +10,12 @@ import { RiLogoutCircleLine } from "react-icons/ri";
 import Link from "next/link";
 import { useAuth } from "@/hooks";
 import { ClipLoader } from "react-spinners";
+import { usePathname } from "next/navigation";
+import { TOKEN_KEY_STAFF } from "@/constants";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading, user } = useAuth("/staff/login");
+  const currentRoute = usePathname();
+  const { isLoading, user } = useAuth("/staff/login", TOKEN_KEY_STAFF);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   let navLinks = [
@@ -103,7 +106,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* <button onClick={toggleSidebarOpen}>Close</button> */}
             <ul className="flex flex-col gap-2 mt-8 lg:mt-12">
               {navLinks.map((link) => (
-                <li key={link.id}>
+                <li
+                  key={link.id}
+                  className={`duration-200 ${
+                    link.to === currentRoute || currentRoute.includes(link.to)
+                      ? "bg-gray-50 text-purple-600"
+                      : ""
+                  }`}
+                >
                   <Link
                     href={link.to}
                     className="flex items-center gap-1 px-2 py-1 font-semibold"

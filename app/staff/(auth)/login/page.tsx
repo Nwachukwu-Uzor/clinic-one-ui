@@ -8,12 +8,12 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PulseLoader } from "react-spinners";
 import { authService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
 import { toast } from "react-toastify";
-import { TOKEN_KEY } from "@/constants";
+import { TOKEN_KEY, TOKEN_KEY_STAFF } from "@/constants";
 
 const schema = z.object({
   email: z.string({
@@ -30,6 +30,8 @@ type FormFields = z.infer<typeof schema>;
 
 const Login = () => {
   const router = useRouter();
+  const searchParam = useSearchParams();
+
   const {
     register,
     setError,
@@ -51,7 +53,12 @@ const Login = () => {
         toast.error(response?.message);
       }
       toast.success(response?.message);
-      sessionStorage.setItem(TOKEN_KEY, response?.data?.token);
+      sessionStorage.setItem(TOKEN_KEY_STAFF, response?.data?.token);
+      const redirectUrl = searchParam.get("redirectUrl");
+      if (redirectUrl) {
+        router.push(`/${redirectUrl}`);
+        return;
+      }
       router.push("/staff/dashboard");
     } catch (error: any) {
       const errorData = error?.response?.data?.data?.errors;

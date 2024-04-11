@@ -8,7 +8,7 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PulseLoader } from "react-spinners";
 import { authService } from "@/services";
 import { formatValidationErrors } from "@/utils/shared";
@@ -30,6 +30,8 @@ type FormFields = z.infer<typeof schema>;
 
 const Login = () => {
   const router = useRouter();
+  const searchParam = useSearchParams();
+
   const {
     register,
     setError,
@@ -52,6 +54,11 @@ const Login = () => {
       }
       toast.success(response?.message);
       sessionStorage.setItem(TOKEN_KEY, response?.data?.token);
+      const redirectUrl = searchParam.get("redirectUrl");
+      if (redirectUrl) {
+        router.push(`/${redirectUrl}`);
+        return;
+      }
       router.push("/dashboard");
     } catch (error: any) {
       console.log(error?.response);

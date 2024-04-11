@@ -32,7 +32,7 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-export const PatientAppointment = () => {
+export const Page = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const { user } = useAuth("/login");
 
@@ -171,4 +171,4 @@ export const PatientAppointment = () => {
   );
 };
 
-export default PatientAppointment;
+export default Page;

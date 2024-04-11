@@ -7,3 +7,4 @@ export {
   GET_ALL_DOCTORS
 } from "./query-keys";
 export const TOKEN_KEY = "CLINIC_ONE_AUTH_TOKEN";
+export const TOKEN_KEY_STAFF = "CLINIC_ONE_AUTH_TOKEN_STAFF";
