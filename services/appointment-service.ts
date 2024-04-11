@@ -28,6 +28,29 @@ export class AppointmentService {
 
     return response.data.data;
   }
+  async getAppointmentsByPatientIdList(data: {
+    patientId: string;
+    startDate: Date;
+    endDate: Date;
+    page: number;
+  }) {
+    const response = await axios.post<
+      APIResponseType<PaginatedResponseType<AppointmentType>>
+    >(
+      `${baseApiUrl}/Appointments/GetAppointmentsByPatientIdPaginated`,
+      {
+        ...data,
+        pageSize: 20,
+      },
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+
+    return response.data;
+  }
 
   async creatAnAppointment(data: {
     doctorId: string;

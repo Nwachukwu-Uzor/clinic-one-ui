@@ -1,5 +1,9 @@
 "use client";
-import { CreateAppointment } from "@/components/appointments/create-appointment";
+import {
+  AllAppointments,
+  CreateAppointment,
+  PatientAppointment,
+} from "@/components/appointments/";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -103,7 +107,7 @@ const Appointments = () => {
                 <CreateAppointment />
               </div>
             ) : (
-              <div className="my-2">
+              <div className="my-4">
                 <div className="flex justify-end my-4">
                   <Button>
                     <Link
@@ -114,47 +118,37 @@ const Appointments = () => {
                     </Link>
                   </Button>
                 </div>
-                {data.data.length > 0 ? (
-                  <div className=" bg-white">
-                    <DataTable columns={columns} data={data.data} />
-                    <div className="mt-2 flex items-center justify-between gap-2 px-1">
-                      <ul className="flex items-center border border-purple-600 my-1 rounded-sm">
-                        {new Array(data.totalPages)
-                          .fill("")
-                          .map((_data, i) => i + 1)
-                          .map((page) => (
-                            <li
-                              key={page}
-                              className={`py-1 px-2 text-sm font-semibold [&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-purple-600 duration-100 ease ${
-                                pageNumber === page
-                                  ? "bg-purple-600 text-white"
-                                  : "bg-transparent text-purple-600"
-                              }`}
-                            >
-                              <button onClick={() => handlePaginate(page)}>
-                                {page}
-                              </button>
-                            </li>
-                          ))}
-                      </ul>
-                      <div>
-                        <h4 className="font-medium text-gray-600 text-sm">
-                          Total Staff Count:{" "}
-                          <span className="font-normal">
-                            {data.totalRecords}
-                          </span>
-                        </h4>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-center my-6">
+                  <Link
+                    href="/staff/appointments"
+                    className={`p-2 text-sm rounded-l-sm font-semibold  duration-200 ${
+                      mode === null
+                        ? "bg-purple-600 text-white"
+                        : "bg-white text-purple-600"
+                    }`}
+                  >
+                    All Appointments
+                  </Link>
+                  <Link
+                    href="/staff/appointments?mode=patient-appointments"
+                    className={`p-2 text-sm rounded-r-sm font-semibold  duration-200 ${
+                      mode === "patient-appointments"
+                        ? "bg-purple-600 text-white"
+                        : "bg-white text-purple-600"
+                    }`}
+                  >
+                    Patient Appointment
+                  </Link>
+                </div>
+
+                {mode === "patient-appointments" ? (
+                  <PatientAppointment />
                 ) : (
-                  <article className="min-h-[40vh] mt-4 bg-white flex items-center justify-center text-center rounded-md">
-                    <div>
-                      <h3 className="scroll-m-20 text-2xl font-semibold text-gray-600 tracking-tight">
-                        No Appointment Found.
-                      </h3>
-                    </div>
-                  </article>
+                  <AllAppointments
+                    data={data}
+                    handlePaginate={handlePaginate}
+                    pageNumber={pageNumber}
+                  />
                 )}
               </div>
             )}
