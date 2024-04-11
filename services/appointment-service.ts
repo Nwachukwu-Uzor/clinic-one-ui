@@ -28,6 +28,23 @@ export class AppointmentService {
 
     return response.data.data;
   }
+  async creatAnAppointment(data: {
+    doctorId: string;
+    patientId: string;
+    appointmentTime: Date;
+    description?: string;
+  }) {
+    const response = await axios.post<APIResponseType<string>>(
+      `${baseApiUrl}/Appointments/CreateAppointment`,
+      data,
+      {
+        headers: {
+          Authorization: this._accessHeader,
+        },
+      }
+    );
+    return response.data;
+  }
   async getAppointmentsByPatientIdList(data: {
     patientId: string;
     startDate: Date;
@@ -51,22 +68,28 @@ export class AppointmentService {
 
     return response.data;
   }
-
-  async creatAnAppointment(data: {
-    doctorId: string;
+  async getAppointmentsByPatientAppUserIdList(data: {
     patientId: string;
-    appointmentTime: Date;
-    description?: string;
+    startDate: Date;
+    endDate: Date;
+    page: number;
   }) {
-    const response = await axios.post<APIResponseType<string>>(
-      `${baseApiUrl}/Appointments/CreateAppointment`,
-      data,
+    const response = await axios.post<
+      APIResponseType<PaginatedResponseType<AppointmentType>>
+    >(
+      `${baseApiUrl}/Appointments/GetAppointmentsByPatientAppUserIdPaginated`,
+      {
+        ...data,
+        pageSize: 20,
+      },
       {
         headers: {
           Authorization: this._accessHeader,
         },
       }
     );
+
     return response.data;
   }
+
 }

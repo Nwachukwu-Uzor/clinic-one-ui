@@ -32,6 +32,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       ),
       to: "/profile",
     },
+    {
+      id: 3,
+      content: (
+        <>
+          <FaCircleUser /> Appointments
+        </>
+      ),
+      to: "/appointments",
+    },
   ];
 
   
