@@ -40,6 +40,7 @@ const Login = () => {
   } = useForm<FormFields>({
     resolver: zodResolver(schema),
   });
+
   const [showPassword, setShowPassword] = useState(false);
 
   const handleToggleShowPassword = () => {
